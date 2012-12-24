@@ -30,6 +30,7 @@ module.exports = function(grunt) {
 			compress: {
 				files: {
 					'dist/compiled.css': [
+						'css/bootstrap.min.css',
 						'dist/application-embed.css'
 					]
 				}
@@ -41,6 +42,44 @@ module.exports = function(grunt) {
 				dest: 'dist/application-embed.css',
 				deleteAfterEncoding: false
 			}
+		},
+		clean: {
+			css: ['dist/application-embed.css'],
+			dist: ['dist/']
+		},
+		mocha: {
+			all: ['test/index.html']
+		},
+		targethtml: {
+			dist: {
+				src: 'index.html',
+				dest: 'dist/index.html'
+			}
+		},
+		copy: {
+			dist: {
+				files: {
+					'dist/js/require.js': 'components/requirejs/require.js',
+					'dist/font-awesome/css/': 'components/font-awesome/css/*.css',
+					'dist/font-awesome/font/': 'components/font-awesome/font/*',
+					'dist/font-awesome/FontAwesome.ttf': 'components/font-awesome/FontAwesome.ttf',
+					'dist/favicon.ico': 'favicon.ico'
+				}
+			}
 		}
 	});
+
+	grunt.loadNpmTasks('grunt-contrib-requirejs');
+	grunt.loadNpmTasks('grunt-contrib-mincss');
+	grunt.loadNpmTasks('grunt-image-embed');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-mocha');
+    grunt.loadNpmTasks('grunt-targethtml');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+
+    grunt.registerTask('package', 'clean:dist compile:js compile:css compile:html copy:dist');
+    grunt.registerTask('compile:js', 'requirejs');
+    grunt.registerTask('compile:css', 'imageEmbed mincss clean:css');
+    grunt.registerTask('compile:html', 'targethtml:dist');
+    grunt.registerTask('test', 'lint mocha');
 };
